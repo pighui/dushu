@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-import scrapy
+
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider, Rule
+
+from dushu.items import DushuItem
 
 
 class BookSpider(CrawlSpider):
@@ -20,11 +22,16 @@ class BookSpider(CrawlSpider):
 
     def parse_item(self, response):
         item = {}
-        item['name'] = response.css('.book-title h1').xpath('./text()').get()
-        item['price'] = response.css('.num').xpath('./text()').get()[1:]
-        item['author'] = response.css('.book-details-left').xpath('.//tr[1]//a/text()').get()
-        item['publisher'] = response.css('.book-details-left').xpath('.//tr[2]//a/text()').get()
+        item['name'] = response.css('.book-title').xpath('./h1/text()').get()
+        price = response.css('.num').xpath('./text()').get()
+        if '¥' in price:
+            price = price[1:]
+        else:
+            price = price
+        item['price'] = price
+        item['author'] = response.css('.book-details-left').xpath('.//tr[1]/td[2]/text()').get()
+        item['publisher'] = response.css('.book-details-left').xpath('.//tr[2]/td[2]/a/text()').get()
         item['publish_date'] = response.css('.book-details').xpath('./table//tr[1]/td[4]/text()').get()
         item['isbn'] = response.css('.book-details').xpath('./table//tr[1]/td[2]/text()').get()
         item['detail_url'] = response.url
-        return item
+        yield item
