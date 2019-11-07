@@ -21,11 +21,11 @@ class DushuPipeline(object):
             sql = '''
             create table dushu_book(id integer PRIMARY key auto_increment,
                                 b_name varchar(50),
-                                b_author varchar(30),
+                                b_author varchar(50),
                                 b_price FLOAT,
                                 b_publisher varchar(50),
                                 b_publish_date date,
-                                b_isbn varchar(20),
+                                b_isbn varchar(50),
                                 b_detail_url varchar(50))
             '''
             c.execute(sql)
