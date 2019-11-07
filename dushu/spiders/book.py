@@ -4,12 +4,14 @@ from scrapy import Request
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider, Rule
 
+from dushu.settings import HOST, PORT
+
 
 class BookSpider(CrawlSpider):
     name = 'book'
     allowed_domains = ['www.dushu.com']
-    start_urls = ['http://www.dushu.com/book/']
-    r = Redis(host='127.0.0.1', port=6379)
+    start_urls = ['https://www.dushu.com/book/']
+    r = Redis(host=HOST, port=PORT)
     rules = (
         # 提取图书的所有分类，如果没有指定callback，默认由parse来解析
         Rule(LinkExtractor(restrict_css='.sub-catalog'), follow=True),

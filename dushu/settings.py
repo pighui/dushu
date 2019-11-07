@@ -27,6 +27,9 @@ DB_CONFIG = {
     'charset' : 'utf8'
 }
 
+# redis_config
+HOST = '127.0.0.1'
+PORT = 6379
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'dushu (+http://www.yourdomain.com)'
