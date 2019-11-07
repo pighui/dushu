@@ -1,24 +1,33 @@
 # -*- coding: utf-8 -*-
-
+from redis import Redis
+from scrapy import Request
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider, Rule
-
-from dushu.items import DushuItem
 
 
 class BookSpider(CrawlSpider):
     name = 'book'
     allowed_domains = ['www.dushu.com']
     start_urls = ['http://www.dushu.com/book/']
-
+    r = Redis(host='127.0.0.1', port=6379)
     rules = (
         # 提取图书的所有分类，如果没有指定callback，默认由parse来解析
         Rule(LinkExtractor(restrict_css='.sub-catalog'), follow=True),
         # 提取分类下的所有页规则
-        Rule(LinkExtractor(restrict_css='.pages'), follow=True),
-        # 提取详情页面的规则f
-        Rule(LinkExtractor(allow=r'/book/\d+/'), callback='parse_item', follow=False)
+        Rule(LinkExtractor(restrict_css='.pages'), callback='parse_detail', follow=True),
+        # 提取详情页面的规则
+        # Rule(LinkExtractor(allow=r'/book/\d+/'), callback='parse_item', follow=False)
     )
+
+    def parse_detail(self, response):
+        url_list = response.xpath("//div[@class='book-info']/h3/a/@href").extract()
+        for url in url_list:
+            full_url = 'https://www.dushu.com' + url
+            result = self.r.sadd('books_url', full_url)
+            if result:
+                yield Request(url=full_url, callback=self.parse_item)
+            else:
+                print(full_url, '已经爬取过了')
 
     def parse_item(self, response):
         item = {}
