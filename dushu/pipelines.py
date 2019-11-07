@@ -17,9 +17,8 @@ class DushuPipeline(object):
 
     def init_db(self):
         with self.conn.cursor(cursor=DictCursor) as c:
-            c.execute('drop table if exists dushu_book')
             sql = '''
-            create table dushu_book(id integer PRIMARY key auto_increment,
+            create table if not exists dushu_book(id integer PRIMARY key auto_increment,
                                 b_name varchar(50),
                                 b_author varchar(50),
                                 b_price FLOAT,
@@ -36,10 +35,7 @@ class DushuPipeline(object):
             cols = ", ".join('`{}`'.format('b_' + k) for k in item.keys())
             val_cols = ', '.join('%({})s'.format(k) for k in item.keys())
             res_sql = sql % (cols, val_cols)
-
             c.execute(res_sql, args=item)
-
-
             self.conn.commit()
         return item
 
